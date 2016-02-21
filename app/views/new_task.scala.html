@@ -1,0 +1,13 @@
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+@import helper._
+@(taskForm: Form[TaskFormData])
+<h2>Add a new idea</h2>
+
+@form(routes.Tasks.newTask) {
+
+    @inputText(taskForm("label"), '_label -> "Task name", 'placeholder -> "Task name")
+    @inputText(taskForm("owner"), '_label -> "Author")
+
+    <input type="submit" value="Create">
+}

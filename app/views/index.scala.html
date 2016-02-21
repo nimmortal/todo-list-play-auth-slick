@@ -1,0 +1,54 @@
+@import model.Task
+@(tasks: Seq[Task])
+@import helper._
+
+@main("Todo list") {
+
+    <h1>@tasks.size idea(s)</h1>
+
+    <table style="text-align: center ; border: 1px double black ; width: 100% ;">
+        <tr>
+            <th>id</th>
+            <th>Idea</th>
+            <th>Who</th>
+            <th>When</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        @tasks.map { task =>
+
+        @if(!task.ready) {
+            <tr>
+        } else {
+            <tr style="color: red ; font-weight: bold ; font-size: 16px ;">
+            }
+        <td>@task.id</td>
+            <td>@task.label</td>
+            <td>@task.owner</td>
+            <td>@task.myTime</td>
+            <td>@if(!task.ready) {
+                unfinished
+            } else {
+                finished
+            }</td>
+            <td>
+                <table align=center>
+                    <td>@form(routes.Tasks.deleteTask(task.id)) {
+                        <input type="submit" value="Delete" onclick="return confirm('Are you sure?');">
+                        }</td>
+                    @if(!task.ready) {
+                        <td>@form(routes.Tasks.completeTask(task.id)) {
+                            <input type="submit" value="Completed" onclick="return confirm('Are you sure?');">
+                            }</td>
+                    }
+                </table>
+            </td>
+        </tr>
+        }
+    </table>
+
+    @form(routes.Tasks.addTask) {
+        <input type="submit" value="+ Add">
+    }
+
+}
