@@ -1,7 +1,7 @@
-package tabels
+package model.task.tabels
 
+import model.task.Task
 import slick.driver.H2Driver.api._
-import model.Task
 
 class TasksTable(tag: Tag) extends Table[Task](tag, "task") {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)

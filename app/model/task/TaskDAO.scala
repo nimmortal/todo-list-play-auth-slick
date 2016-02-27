@@ -1,16 +1,15 @@
-package model
+package model.task
 
+import model.task.tabels.TasksTable
 import play.api.Play
 import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
-import tabels.TasksTable
+
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-case class Task(id: Long, label: String, owner: String, myTime: String, ready: Boolean)
-
-object Task {
+object TaskDAO {
 
   val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
   val tasks = TableQuery[TasksTable]
