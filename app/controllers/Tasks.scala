@@ -3,7 +3,7 @@ package controllers
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import model.task.TaskDAO
+import model.task.{Task, TaskDAO}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
@@ -19,22 +19,38 @@ class Tasks extends Controller {
   }
 
   def addTask() = Action {
-    Ok(views.html.new_task(taskForm.fill(TaskForm("", "Author"))))
+    Ok(views.html.task(None, taskForm))
+  }
+
+  def editTask(id: Long) = Action {
+    val task = TaskDAO get id
+    Ok(views.html.task(Some(id), taskForm.fill(TaskForm(task.get.label, task.get.owner))))
   }
 
   def newTask = Action { implicit request =>
     taskForm.bindFromRequest().fold(
-      errors => BadRequest(views.html.index(TaskDAO getAll)),
+      errors => BadRequest(views.html.task(None, errors)),
       data => {
         val today = Calendar.getInstance().getTime
         val timeFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
         val time = timeFormat.format(today)
-        //----------------------------
+
         TaskDAO.create(data.label, data.owner, time)
         Redirect(routes.Tasks.allTasks())
       }
     )
+  }
 
+  def updateTask(id: Long) = Action { implicit request =>
+    taskForm.bindFromRequest().fold(
+      errors => BadRequest(views.html.task(Some(id), errors)),
+      data => {
+        val oldTask = TaskDAO get id get
+
+        TaskDAO.update(new Task(id, data.label, data.owner, oldTask.myTime, oldTask.ready))
+        Redirect(routes.Tasks.allTasks())
+      }
+    )
   }
 
   def deleteTask(id: Long) = Action {

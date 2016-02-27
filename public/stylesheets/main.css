@@ -1,0 +1,9 @@
+.form-control {
+    display: block;
+    width: 10%;
+    height: 26px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+}

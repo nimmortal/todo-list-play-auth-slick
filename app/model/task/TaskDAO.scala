@@ -20,6 +20,11 @@ object TaskDAO {
 
   def create(label: String, owner: String, time: String): Unit = db.run(tasks += new Task(0, label, owner, time, false))
 
+  def update(task: Task): Unit = {
+    val query = tasks.filter(_.id === task.id)
+    db.run(query.update(task))
+  }
+
   def delete(task: Task): Unit = db.run(tasks.filter(_.id === task.id).delete)
 
   def complete(task: Task): Unit = {

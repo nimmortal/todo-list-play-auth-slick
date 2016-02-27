@@ -1,0 +1,48 @@
+@import helper._
+@import play.api.Play.current
+@import play.api.i18n.Messages.Implicits._
+@(id: Option[Long], taskForm: Form[TaskForm])
+
+<h2>Add a new idea</h2>
+
+@main(if (id.isEmpty) "Add new task" else "Edit task") {
+    @if(id.isEmpty) {
+        @form(routes.Tasks.newTask) {
+
+            @inputText(taskForm("label"),
+                '_label -> "Task name",
+                '_help -> "",
+                'class -> "form-control",
+                'placeholder -> "Task name")
+
+            @inputText(taskForm("owner"),
+                '_label -> "Author",
+                '_help -> "",
+                'class -> "form-control",
+                '_showConstraints -> false)
+
+            <input type="submit" value="Create" class="btn primary">
+            or
+            <a href="@routes.Tasks.allTasks()" class="btn">Cancel</a>
+        }
+    } else {
+        @form(routes.Tasks.updateTask(id.get)) {
+
+            @inputText(taskForm("label"),
+                '_label -> "Task name",
+                '_help -> "",
+                'placeholder -> "Task name")
+            @inputText(taskForm("owner"),
+                '_label -> "Author",
+                '_help -> "",
+                '_showConstraints -> false)
+
+            <input type="submit" value="Update" class="btn primary">
+            or
+            <a href="@routes.Tasks.allTasks()" class="btn">Cancel</a>
+        }
+    }
+}
+
+
+
