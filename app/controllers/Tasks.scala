@@ -12,7 +12,7 @@ import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-class Tasks extends Controller {
+object Tasks extends Controller {
 
   def allTasks = Action {
     Ok(views.html.index(TaskDAO getAll))

@@ -2,8 +2,16 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index
+# Standard
+GET     /                            controllers.Sessions.login
+POST    /login                       controllers.Sessions.authenticate
+GET     /logout                      controllers.Sessions.logout
+
+# Messages
+GET     /messages/main               controllers.Messages.main
+GET     /messages/list               controllers.Messages.list
+GET     /messages/detail/:id         controllers.Messages.detail(id: Int)
+GET     /messages/write              controllers.Messages.write
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
