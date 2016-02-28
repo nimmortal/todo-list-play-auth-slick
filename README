@@ -1,7 +1,5 @@
-This is your new Play application
-=================================
-
 Education project on Play2 framework with:
 * Scala
 * Slick
 * SBT
+* Play2-auth
