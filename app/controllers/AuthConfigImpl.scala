@@ -1,9 +1,8 @@
 package controllers
 
 import jp.t2v.lab.play2.auth._
-import model.Role
-import model.Role.NormalUser
-import model.user.{Account, UserDAO}
+import model.user.Role.{Administrator, User}
+import model.user.{Account, Role, UserDAO}
 import play.api.mvc.Results._
 import play.api.mvc._
 
@@ -56,7 +55,7 @@ trait AuthConfigImpl extends AuthConfig {
     */
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     //    Future.successful(Redirect(routes.Messages.main()))
-    val uri = request.session.get("access_uri").getOrElse(routes.Messages.main.url.toString)
+    val uri = request.session.get("access_uri").getOrElse(routes.Tasks.allTasks().url.toString)
     Future.successful(Redirect(uri).withSession(request.session - "access_uri"))
   }
 
@@ -86,9 +85,9 @@ trait AuthConfigImpl extends AuthConfig {
     */
   def authorize(user: User, authority: Authority)(implicit ctx: ExecutionContext): Future[Boolean] = Future.successful {
     (user.role, authority) match {
-      case ( "Administrator", _ ) => true
-      case ( "NormalUser", NormalUser ) => true
-      case _                        => false
+      case ( Administrator, _ ) => true
+      case ( User, User ) => true
+      case _              => false
     }
   }
 

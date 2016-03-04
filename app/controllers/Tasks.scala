@@ -3,31 +3,36 @@ package controllers
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
+import model.user.Role
+import model.user.Role.{Administrator, User}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
+import play.twirl.api.Html
+import views.html
 
 import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-object Tasks extends Controller {
+object Tasks extends Controller with AuthElement with AuthConfigImpl {
 
-  def allTasks = Action {
+  def allTasks = StackAction(AuthorityKey -> User) { implicit request =>
     Ok(views.html.index(TaskDAO getAll))
   }
 
-  def addTask() = Action {
+  def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
     Ok(views.html.task(None, taskForm))
   }
 
-  def editTask(id: Long) = Action {
+  def editTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
     val task = TaskDAO get id
     Ok(views.html.task(Some(id), taskForm.fill(TaskForm(task.get.label, task.get.owner))))
   }
 
-  def newTask = Action { implicit request =>
+  def newTask = StackAction(AuthorityKey -> User) { implicit request =>
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(None, errors)),
       data => {
@@ -41,7 +46,7 @@ object Tasks extends Controller {
     )
   }
 
-  def updateTask(id: Long) = Action { implicit request =>
+  def updateTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(Some(id), errors)),
       data => {
@@ -53,7 +58,7 @@ object Tasks extends Controller {
     )
   }
 
-  def deleteTask(id: Long) = Action {
+  def deleteTask(id: Long) = StackAction(AuthorityKey -> Administrator) { implicit request =>
     val task = TaskDAO.get(id)
 
     if (task.isDefined)
@@ -62,7 +67,7 @@ object Tasks extends Controller {
     Redirect(routes.Tasks.allTasks())
   }
 
-  def completeTask(id: Long) = Action {
+  def completeTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
     val task = TaskDAO.get(id)
 
     if (task.isDefined)
@@ -78,5 +83,6 @@ object Tasks extends Controller {
     )(TaskForm.apply)(TaskForm.unapply)
   )
 
+  protected implicit def template(implicit user: User): String => Html => Html = html.fullTemplate(user)
 }
 

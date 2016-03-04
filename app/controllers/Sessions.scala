@@ -13,7 +13,7 @@ import scala.concurrent.Future
 object Sessions extends Controller with LoginLogout with AuthConfigImpl {
 
   val loginForm = Form {
-    mapping("email" -> email, "password" -> text)(UserDAO.authenticate)(_.map(u => (u.email, "")))
+    mapping("login" -> email, "password" -> text)(UserDAO.authenticate)(_.map(u => (u.email, "")))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
