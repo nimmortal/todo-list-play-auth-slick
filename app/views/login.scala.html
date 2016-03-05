@@ -5,19 +5,13 @@
 <html>
     <head>
         <title>Login</title>
-        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.css")">
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.min.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
     </head>
     <body>
 
-        @helper.form(controllers.routes.Sessions.authenticate) {
 
-            @form.globalError.map { error =>
-                <p class="error">
-                    @error.message
-                </p>
-            }
-
+       @helper.form(controllers.routes.Sessions.authenticate) {
             @flash.get("success").map { message =>
                 <p class="success">
                     @message
@@ -37,6 +31,13 @@
                                 <div class="form-group">
                                     <input id="password" name="password" type="password"
                                         class="form-control input-lg" placeholder="Password">
+                                </div>
+                                <div>
+                                    @form.globalError.map { error =>
+                                        <p class="error">
+                                            @error.message
+                                        </p>
+                                    }
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" value="login" class="btn btn-primary btn-lg btn-block">Sign In</button>
