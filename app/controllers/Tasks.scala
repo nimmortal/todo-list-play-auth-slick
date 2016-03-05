@@ -83,6 +83,6 @@ object Tasks extends Controller with AuthElement with AuthConfigImpl {
     )(TaskForm.apply)(TaskForm.unapply)
   )
 
-  protected implicit def template(implicit user: User): String => Html => Html = html.fullTemplate(user)
+//  protected implicit def template(implicit user: User): String => Html => Html = html.main(user)
 }
 

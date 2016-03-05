@@ -12,4 +12,10 @@ object Role {
     case "User"    => User
     case _ => throw new IllegalArgumentException()
   }
+
+  def toString(role: Role): String = role match {
+    case Administrator => "Administrator"
+    case User    => "User"
+    case _ => throw new IllegalArgumentException()
+  }
 }
