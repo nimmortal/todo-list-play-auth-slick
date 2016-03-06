@@ -7,6 +7,8 @@ import play.api.data.Forms._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, Controller}
 import views.html
+import play.api.i18n.Messages.Implicits._
+import play.api.Play.current
 
 import scala.concurrent.Future
 
@@ -17,7 +19,10 @@ object Sessions extends Controller with OptionalAuthElement with LoginLogout wit
   }
 
   val loginForm = Form {
-    mapping("login" -> email, "password" -> text)(UserDAO.authenticate)(_.map(u => (u.email, "")))
+    mapping(
+      "login" -> email.verifying("Empty email", s => !s.isEmpty),
+      "password" -> text.verifying("Empty password", s => !s.isEmpty)
+    )(UserDAO.authenticate)(_.map(u => (u.email, "")))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
