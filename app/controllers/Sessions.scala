@@ -1,6 +1,6 @@
 package controllers
 
-import jp.t2v.lab.play2.auth.LoginLogout
+import jp.t2v.lab.play2.auth.{OptionalAuthElement, LoginLogout}
 import model.user.UserDAO
 import play.api.data.Form
 import play.api.data.Forms._
@@ -10,15 +10,22 @@ import views.html
 
 import scala.concurrent.Future
 
-object Sessions extends Controller with LoginLogout with AuthConfigImpl {
+object Sessions extends Controller with OptionalAuthElement with LoginLogout with AuthConfigImpl {
+
+  val index = Action { implicit request =>
+    Redirect(routes.Tasks.allTasks())
+  }
 
   val loginForm = Form {
     mapping("login" -> email, "password" -> text)(UserDAO.authenticate)(_.map(u => (u.email, "")))
       .verifying("Invalid email or password", result => result.isDefined)
   }
 
-  def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+  def login = StackAction { implicit request =>
+    if (loggedIn.isDefined)
+      Redirect(routes.Tasks.allTasks())
+    else
+      Ok(html.login(loginForm))
   }
 
   def logout = Action.async { implicit request =>

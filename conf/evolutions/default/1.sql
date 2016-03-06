@@ -12,24 +12,38 @@ CREATE TABLE task (
 );
 
 
-INSERT INTO task VALUES (DEFAULT, 'TASK1', 'Yeah', 'Lol', FALSE);
-INSERT INTO task VALUES (DEFAULT, 'TASK2', 'Yeah2', 'Lol', TRUE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 1', 'System', NOW(), FALSE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 2', 'System', NOW(), FALSE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 3', 'System', NOW(), FALSE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 4', 'System', NOW(), FALSE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 5', 'System', NOW(), TRUE);
+INSERT INTO task VALUES (DEFAULT, 'Test task 6', 'System', NOW(), TRUE);
 
-CREATE SEQUENCE user_id_seq;
-CREATE TABLE users (
-  id    INTEGER NOT NULL DEFAULT nextval('user_id_seq'),
+CREATE SEQUENCE account_id_seq;
+CREATE TABLE accounts (
+  id    INTEGER NOT NULL DEFAULT nextval('account_id_seq'),
   email VARCHAR(100),
   password VARCHAR(100),
-  name VARCHAR(100),
   role VARCHAR(100)
 );
 
-INSERT INTO users VALUES (DEFAULT, 'a@a', 'a', 'User 1', 'Administrator');
-INSERT INTO users VALUES (DEFAULT, 'b@b', 'a', 'User 2', 'User');
+INSERT INTO accounts VALUES (DEFAULT, 'a@a', 'a', 'Administrator');
+INSERT INTO accounts VALUES (DEFAULT, 'b@b', 'b', 'User');
+
+CREATE TABLE users (
+  email VARCHAR(100),
+  name VARCHAR(100),
+  surname VARCHAR(100),
+  address VARCHAR(100),
+  FOREIGN KEY (email) REFERENCES accounts(email)
+);
+
+INSERT INTO users VALUES ('a@a', 'A-name', 'A-surname', 'A-Empty Street');
+INSERT INTO users VALUES ('b@b', 'B-name', 'B-surname', 'B-Empty Street');
 
 # --- !Downs
 
 DROP TABLE task;
 DROP SEQUENCE task_id_seq;
 DROP TABLE users;
-DROP SEQUENCE user_id_seq;
+DROP SEQUENCE account_id_seq;

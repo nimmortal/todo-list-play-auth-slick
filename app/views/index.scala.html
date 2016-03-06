@@ -1,5 +1,8 @@
 @import model.task.Task
-@(tasks: Seq[Task])
+@import controllers.routes
+@import model.user.UserModel
+@import model.user.Role
+@(tasks: Seq[Task])(implicit user: Option[UserModel])
     @import helper._
 
     @main("Todo list") {
@@ -46,17 +49,16 @@
                                     <td>@if(!task.ready) { unfinished } else { finished }</td>
 
                                     <td>
-                                        @form(routes.Tasks.editTask(task.id)) {
-                                            <input type="submit" value="Edit" class="btn btn-default pull-left">
-                                        }
-                                        @form(routes.Tasks.deleteTask(task.id)) {
-                                            <input type="submit" value="Delete" class="btn btn-danger pull-left" onclick="return confirm('Are you sure?');">
-                                        }
-                                        @if(!task.ready) {
-                                            @form(routes.Tasks.completeTask(task.id)) {
-                                                <input type="submit" value="Completed" class="btn btn-success pull-left" onclick="return confirm('Are you sure?');">
-                                                }
-                                        }
+                                        <div class="btn-group btn-group-sm" >
+
+                                            <a type="button" href="@routes.Tasks.editTask(task.id)" class="btn btn-default">Edit</a>
+                                            @if(!task.ready) {
+                                                <a type="button" href="@routes.Tasks.completeTask(task.id)" class="btn btn-success">Complete</a>
+                                            }
+                                            @if(user.exists(_.account.role == Role.Administrator)) {
+                                                <a type="button" href="@routes.Tasks.deleteTask(task.id)" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                                            }
+                                        </div>
                                     </td>
                                     </tr>
                                     }

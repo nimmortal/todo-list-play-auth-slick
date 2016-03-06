@@ -5,14 +5,15 @@ import java.util.Calendar
 
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
-import model.user.Role
+import model.user.{Role, Account, UserDAO}
 import model.user.Role.{Administrator, User}
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
 import play.twirl.api.Html
-import views.html
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
@@ -20,7 +21,8 @@ case class TaskForm(label: String, owner: String)
 object Tasks extends Controller with AuthElement with AuthConfigImpl {
 
   def allTasks = StackAction(AuthorityKey -> User) { implicit request =>
-    Ok(views.html.index(TaskDAO getAll))
+    val user: Account = loggedIn
+    Ok(views.html.index(TaskDAO getAll)(Await.result(UserDAO getUser user, Duration.Inf)))
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
