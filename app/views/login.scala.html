@@ -30,7 +30,7 @@
                                 </div>
                                 <div>
                                     @for(error <- form("login").errors) {
-                                        <p class="text-danger">@error.message</p>
+                                        <p class="text-danger">@Messages(error.message)</p>
                                     }
                                 </div>
                                 <div class="form-group">
@@ -39,11 +39,11 @@
                                 </div>
                                 <div>
                                     @for(error <- form("password").errors) {
-                                        <p class="text-danger">@error.message</p>
+                                        <p class="text-danger">@Messages(error.message)</p>
                                     }
                                     @form.globalError.map { error =>
                                         <p class="error">
-                                            @error.message
+                                            @Messages(error.message)
                                         </p>
                                     }
                                 </div>

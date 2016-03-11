@@ -20,10 +20,10 @@ object Sessions extends Controller with OptionalAuthElement with LoginLogout wit
 
   val loginForm = Form {
     mapping(
-      "login" -> email.verifying("Empty email", s => !s.isEmpty),
-      "password" -> text.verifying("Empty password", s => !s.isEmpty)
+      "login" -> email.verifying("email.empty", s => !s.isEmpty),
+      "password" -> text.verifying("password.empty", s => !s.isEmpty)
     )(UserDAO.authenticate)(_.map(u => (u.email, "")))
-      .verifying("Invalid email or password", result => result.isDefined)
+      .verifying("error.login", result => result.isDefined)
   }
 
   def login = StackAction { implicit request =>

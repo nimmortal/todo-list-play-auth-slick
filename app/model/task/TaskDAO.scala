@@ -6,17 +6,16 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.Future
 
 object TaskDAO {
 
   val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
   val tasks = TableQuery[TasksTable]
 
-  def get(id: Long): Option[Task] = Await.result(db.run(tasks.filter(_.id === id).result.headOption), Duration.Inf)
+  def get(id: Long): Future[Option[Task]] = db.run(tasks.filter(_.id === id).result.headOption)
 
-  def getAll: Seq[Task] = Await.result(db.run(tasks.result), Duration.Inf)
+  def getAll: Future[Seq[Task]] = db.run(tasks.result)
 
   def create(label: String, owner: String, time: String): Unit = db.run(tasks += new Task(0, label, owner, time, false))
 

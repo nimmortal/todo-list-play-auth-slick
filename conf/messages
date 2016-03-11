@@ -1,1 +1,4 @@
 error.email=Invalid email!
+email.empty=Empty email!
+password.empty=Empty password!
+error.login=Invalid email or password!
