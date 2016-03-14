@@ -1,8 +1,9 @@
 package model.user
 
+import javax.inject.{Inject, Singleton}
+import com.google.inject.ImplementedBy
 import model.user.table.{UserTable, AccountTable}
-import play.api.Play
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
 import slick.driver.H2Driver.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -10,9 +11,16 @@ import slick.driver.JdbcProfile
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-object UserDAO {
+@ImplementedBy(classOf[UserDAO])
+trait UserDAOTrait {
+  def findUser(id: Long) : Future[Option[Account]]
+  def authenticate(email: String, password: String): Option[Account]
+}
 
-  val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
+@Singleton
+class UserDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
+  extends HasDatabaseConfigProvider[JdbcProfile] with UserDAOTrait {
+
   val accounts = TableQuery[AccountTable]
   val users = TableQuery[UserTable]
 

@@ -1,16 +1,17 @@
 package model.task
 
+import javax.inject.{Inject, Singleton}
 import model.task.tabels.TasksTable
-import play.api.Play
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
 
-object TaskDAO {
+@Singleton()
+class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
+  extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  val db = DatabaseConfigProvider.get[JdbcProfile](Play.current).db
   val tasks = TableQuery[TasksTable]
 
   def get(id: Long): Future[Option[Task]] = db.run(tasks.filter(_.id === id).result.headOption)

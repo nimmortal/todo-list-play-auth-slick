@@ -2,10 +2,11 @@ package controllers
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import javax.inject.Inject
 
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
-import model.user.{Role, Account, UserDAO}
+import model.user.{Account, UserDAO}
 import model.user.Role.{Administrator, User}
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.data.Forms._
@@ -16,12 +17,12 @@ import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-object Tasks extends Controller with AuthElement with AuthConfigImpl {
+class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO) extends Controller with AuthElement with AuthConfigImpl {
 
   def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
     val user: Account = loggedIn
-    val tasks = TaskDAO getAll
-    val account = UserDAO getUser user
+    val tasks = taskDAO getAll
+    val account = userDAO getUser user
 
     tasks zip account map {
       case (t, a) => Ok(views.html.index(t)(a))
@@ -33,7 +34,7 @@ object Tasks extends Controller with AuthElement with AuthConfigImpl {
   }
 
   def editTask(id: Long) = AsyncStack(AuthorityKey -> User) { implicit request =>
-    val task = TaskDAO get id
+    val task = taskDAO get id
     task.map(t => Ok(views.html.task(Some(id), taskForm.fill(TaskForm(t.get.label, t.get.owner)))))
   }
 
@@ -45,7 +46,7 @@ object Tasks extends Controller with AuthElement with AuthConfigImpl {
         val timeFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
         val time = timeFormat.format(today)
 
-        TaskDAO.create(data.label, data.owner, time)
+        taskDAO.create(data.label, data.owner, time)
         Redirect(routes.Tasks.allTasks())
       }
     )
@@ -55,26 +56,26 @@ object Tasks extends Controller with AuthElement with AuthConfigImpl {
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(Some(id), errors)),
       data => {
-        val oldTask = TaskDAO get id
+        val oldTask = taskDAO get id
 
-        oldTask.map(t => TaskDAO.update(new Task(id, data.label, data.owner, t.get.myTime, t.get.ready)))
+        oldTask.map(t => taskDAO.update(new Task(id, data.label, data.owner, t.get.myTime, t.get.ready)))
         Redirect(routes.Tasks.allTasks())
       }
     )
   }
 
   def deleteTask(id: Long) = StackAction(AuthorityKey -> Administrator) { implicit request =>
-    val task = TaskDAO.get(id)
+    val task = taskDAO.get(id)
 
-    task.map(optTask => optTask.foreach(task => TaskDAO.delete(task)))
+    task.map(optTask => optTask.foreach(task => taskDAO.delete(task)))
 
     Redirect(routes.Tasks.allTasks())
   }
 
   def completeTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
-    val task = TaskDAO.get(id)
+    val task = taskDAO.get(id)
 
-    task.map(optTask => optTask.foreach(task => TaskDAO.complete(task)))
+    task.map(optTask => optTask.foreach(task => taskDAO.complete(task)))
 
     Redirect(routes.Tasks.allTasks())
   }

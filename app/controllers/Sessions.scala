@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject.Inject
+
 import jp.t2v.lab.play2.auth.{OptionalAuthElement, LoginLogout}
 import model.user.UserDAO
 import play.api.data.Form
@@ -12,7 +14,8 @@ import play.api.Play.current
 
 import scala.concurrent.Future
 
-object Sessions extends Controller with OptionalAuthElement with LoginLogout with AuthConfigImpl {
+class Sessions @Inject()(val userDAO: UserDAO)
+  extends Controller with OptionalAuthElement with LoginLogout with AuthConfigImpl {
 
   val index = Action { implicit request =>
     Redirect(routes.Tasks.allTasks())
@@ -22,7 +25,7 @@ object Sessions extends Controller with OptionalAuthElement with LoginLogout wit
     mapping(
       "login" -> email.verifying("email.empty", s => !s.isEmpty),
       "password" -> text.verifying("password.empty", s => !s.isEmpty)
-    )(UserDAO.authenticate)(_.map(u => (u.email, "")))
+    )(userDAO.authenticate)(_.map(u => (u.email, "")))
       .verifying("error.login", result => result.isDefined)
   }
 
@@ -45,5 +48,11 @@ object Sessions extends Controller with OptionalAuthElement with LoginLogout wit
       user           => gotoLoginSucceeded(user.get.id.get)
     )
   }
+
+  def registrationForm = Action { implicit request =>
+    Ok(html.registration(loginForm))
+  }
+
+  def registration = TODO
 
 }

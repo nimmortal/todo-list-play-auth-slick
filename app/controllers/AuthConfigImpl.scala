@@ -2,7 +2,7 @@ package controllers
 
 import jp.t2v.lab.play2.auth._
 import model.user.Role.{Administrator, User}
-import model.user.{Account, Role, UserDAO}
+import model.user.{UserDAOTrait, Account, Role}
 import play.api.mvc.Results._
 import play.api.mvc._
 
@@ -15,9 +15,11 @@ trait AuthConfigImpl extends AuthConfig {
   type User = Account
   type Authority = Role
 
+  val userDAO: UserDAOTrait
+
   val idTag: ClassTag[Id] = classTag[Id]
   val sessionTimeoutInSeconds: Int = 3600
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = UserDAO.findUser(id)
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userDAO.findUser(id)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     val uri = request.session.get("access_uri").getOrElse(routes.Tasks.allTasks().url.toString)
