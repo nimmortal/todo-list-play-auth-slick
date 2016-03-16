@@ -6,16 +6,15 @@ import jp.t2v.lab.play2.auth.{OptionalAuthElement, LoginLogout}
 import model.user.UserDAO
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, Controller}
 import views.html
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
 
 import scala.concurrent.Future
 
-class Sessions @Inject()(val userDAO: UserDAO)
-  extends Controller with OptionalAuthElement with LoginLogout with AuthConfigImpl {
+class Sessions @Inject()(val userDAO: UserDAO, val messagesApi: MessagesApi)
+  extends Controller with OptionalAuthElement with LoginLogout with AuthConfigImpl with I18nSupport {
 
   val index = Action { implicit request =>
     Redirect(routes.Tasks.allTasks())
@@ -48,11 +47,5 @@ class Sessions @Inject()(val userDAO: UserDAO)
       user           => gotoLoginSucceeded(user.get.id.get)
     )
   }
-
-  def registrationForm = Action { implicit request =>
-    Ok(html.registration(loginForm))
-  }
-
-  def registration = TODO
 
 }

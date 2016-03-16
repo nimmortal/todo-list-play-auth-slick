@@ -10,8 +10,8 @@ GET     /login                      @controllers.Sessions.login
 POST    /login                      @controllers.Sessions.authenticate
 GET     /logout                     @controllers.Sessions.logout
 
-GET     /registration               @controllers.Sessions.registrationForm
-POST    /registration               @controllers.Sessions.registration
+GET     /registration               @controllers.Registration.goToRegistration
+POST    /registration               @controllers.Registration.registration
 
 # Tasks
 GET     /task                       @controllers.Tasks.addTask

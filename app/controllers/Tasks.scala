@@ -17,7 +17,8 @@ import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO) extends Controller with AuthElement with AuthConfigImpl {
+class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO)
+  extends Controller with AuthElement with AuthConfigImpl {
 
   def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
     val user: Account = loggedIn
