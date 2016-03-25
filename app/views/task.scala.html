@@ -1,7 +1,5 @@
 @import helper._
-@import play.api.Play.current
-@import play.api.i18n.Messages.Implicits._
-@(id: Option[Long], taskForm: Form[TaskForm])
+@(id: Option[Long], taskForm: Form[TaskForm])(implicit messages: Messages, flash: Flash)
 
 <h2>Add a new idea</h2>
 

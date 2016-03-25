@@ -7,6 +7,7 @@ import javax.inject.Inject
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
 import model.user.{Account, UserDAO}
+import play.api.i18n.{I18nSupport, MessagesApi}
 import model.user.Role.{Administrator, User}
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.data.Forms._
@@ -17,8 +18,8 @@ import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO)
-  extends Controller with AuthElement with AuthConfigImpl {
+class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
+  extends Controller with AuthElement with AuthConfigImpl with I18nSupport {
 
   def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
     val user: Account = loggedIn

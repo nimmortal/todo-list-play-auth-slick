@@ -25,11 +25,25 @@ class UserDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   val users = TableQuery[UserTable]
 
   def findUser(id: Long) : Future[Option[Account]] = db.run(accounts.filter(_.id === id).result.headOption)
+  def findUser(email: String) : Future[Option[Account]] = db.run(accounts.filter(_.email === email).result.headOption)
+
+  def createAccount(account: Account) : Future[Long] = {
+    val accId = {
+      (accounts returning accounts.map(_.id)) += account
+    }
+
+    val id = db.run(accId).map(id => id.get)
+    db.run(users += new User(account.email, "a", "a", "a"))
+    id
+  }
 
   def getUser(acc: Account) : Future[Option[UserModel]] = {
     val innerJoin = for {
       (a, u) <- accounts join users on (_.email === _.email) if a.email === acc.email
     } yield (u, a)
+
+    val res = db.run(users.result)
+    val res1 = db.run(accounts.result)
 
     db.run(innerJoin.result.headOption.map {
       case o: Option[(User, Account)] => Some(new UserModel(o.get._1, o.get._2))

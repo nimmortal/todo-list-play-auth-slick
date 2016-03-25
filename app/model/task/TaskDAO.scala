@@ -18,7 +18,10 @@ class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
 
   def getAll: Future[Seq[Task]] = db.run(tasks.result)
 
-  def create(label: String, owner: String, time: String): Unit = db.run(tasks += new Task(0, label, owner, time, false))
+  def create(label: String, owner: String, time: String): Future[Long] = {
+    val taskId = (tasks returning tasks.map(_.id)) += new Task(0, label, owner, time, false)
+    db.run(taskId)
+  }
 
   def update(task: Task): Unit = {
     val query = tasks.filter(_.id === task.id)

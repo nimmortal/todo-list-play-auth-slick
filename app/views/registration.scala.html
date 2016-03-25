@@ -1,5 +1,4 @@
-@import model.user.Account
-@(form: Form[Option[Account]])(implicit messages: Messages, flash: Flash)
+@(form: Form[LoginForm])(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 
 <html>
@@ -41,11 +40,23 @@
                             <div id="legend">
                                 <legend class="">Register</legend>
                             </div>
+
+                            @form.globalError.map { error =>
+                                <div class="alert alert-danger">
+                                    @Messages(error.message)
+                                </div>
+                            }
+
                             <div class="control-group">
                                 <label class="control-label" for="username">Username</label>
                                 <div class="controls">
                                     <input type="text" id="username" name="username" placeholder="" class="form-control input-lg">
                                     <p class="help-block">Username can contain any letters or numbers, without spaces</p>
+                                </div>
+                                <div>
+                                    @for(error <- form("username").errors) {
+                                        <p class="text-danger">@Messages(error.message)</p>
+                                    }
                                 </div>
                             </div>
 
@@ -55,6 +66,11 @@
                                     <input type="email" id="email" name="email" placeholder="" class="form-control input-lg">
                                     <p class="help-block">Please provide your E-mail</p>
                                 </div>
+                                <div>
+                                @for(error <- form("email").errors) {
+                                    <p class="text-danger">@Messages(error.message)</p>
+                                }
+                                </div>
                             </div>
 
                             <div class="control-group">
@@ -62,6 +78,11 @@
                                 <div class="controls">
                                     <input type="password" id="password" name="password" placeholder="" class="form-control input-lg">
                                     <p class="help-block">Password should be at least 6 characters</p>
+                                </div>
+                                <div>
+                                @for(error <- form("password").errors) {
+                                    <p class="text-danger">@Messages(error.message)</p>
+                                }
                                 </div>
                             </div>
 
