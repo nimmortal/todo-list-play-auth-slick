@@ -13,6 +13,11 @@ GET     /logout                     @controllers.Sessions.logout
 GET     /registration               @controllers.Registration.goToRegistration
 POST    /registration               @controllers.Registration.registration
 
+# Facebook
+GET     /login/facebook             @controllers.FacebookAuthController.login(scope: String)
+GET     /link/facebook              @controllers.FacebookAuthController.link(scope: String)
+GET     /authorize/facebook         @controllers.FacebookAuthController.authorize
+
 # Tasks
 GET     /task                       @controllers.Tasks.addTask
 GET     /tasks                      @controllers.Tasks.allTasks

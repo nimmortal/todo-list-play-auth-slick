@@ -1,5 +1,6 @@
 @import model.user.Account
-@(form: Form[Option[Account]])(implicit messages: Messages, flash: Flash)
+@import model.user.FacebookUser
+@(form: Form[Option[Account]], facebookUser: Option[FacebookUser])(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 
 <html>
@@ -49,6 +50,8 @@
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" value="login" class="btn btn-primary btn-lg btn-block">Sign In</button>
+                                    <a type="button" href="@routes.FacebookAuthController.login("email")"
+                                    class="btn btn-primary btn-lg btn-block">Facebook login</a>
                                     <a type="button" href="@routes.Registration.registration()"
                                     class="btn btn-primary btn-lg btn-block btn-red">Register</a>
                                 </div>

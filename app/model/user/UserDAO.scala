@@ -28,12 +28,12 @@ class UserDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   def findUser(email: String) : Future[Option[Account]] = db.run(accounts.filter(_.email === email).result.headOption)
 
   def createAccount(account: Account) : Future[Long] = {
-    val accId = {
+    val createAccQuery = {
       (accounts returning accounts.map(_.id)) += account
     }
 
-    val id = db.run(accId).map(id => id.get)
-    db.run(users += new User(account.email, "a", "a", "a"))
+    val id = db.run(createAccQuery).map(id => id.get)
+    db.run(users += new User(account.email, "", "", ""))
     id
   }
 

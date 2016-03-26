@@ -3,8 +3,15 @@
 @import model.user.UserModel
 @import model.user.Role
 @(tasks: Seq[Task])(implicit user: Option[UserModel])
-    @import helper._
 
+    <div>
+        @if(user.isDefined) {
+            @user.map(u => u.user.email).getOrElse("")
+            }
+
+    </div>
+
+    @import helper._
     @main("Todo list") {
 
         <div class="container">

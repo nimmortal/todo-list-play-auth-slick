@@ -32,7 +32,7 @@ class Sessions @Inject()(val userDAO: UserDAO, val messagesApi: MessagesApi)
     if (loggedIn.isDefined)
       Redirect(routes.Tasks.allTasks())
     else
-      Ok(html.login(loginForm))
+      Ok(html.login(loginForm, None))
   }
 
   def logout = Action.async { implicit request =>
@@ -43,7 +43,7 @@ class Sessions @Inject()(val userDAO: UserDAO, val messagesApi: MessagesApi)
 
   def authenticate = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => Future.successful(BadRequest(html.login(formWithErrors))),
+      formWithErrors => Future.successful(BadRequest(html.login(formWithErrors, None))),
       user           => gotoLoginSucceeded(user.get.id.get)
     )
   }
