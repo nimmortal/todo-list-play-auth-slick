@@ -17,31 +17,34 @@ INSERT INTO task VALUES (DEFAULT, 'Test task 4', 'System', NOW(), FALSE);
 INSERT INTO task VALUES (DEFAULT, 'Test task 5', 'System', NOW(), TRUE);
 INSERT INTO task VALUES (DEFAULT, 'Test task 6', 'System', NOW(), TRUE);
 
-CREATE TABLE accounts (
+CREATE TABLE users (
   id    INTEGER AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(100),
-  password VARCHAR(100),
-  role VARCHAR(100)
+  role  VARCHAR(100)
 );
 
-INSERT INTO accounts VALUES (DEFAULT, 'a@a', 'a', 'Administrator');
-INSERT INTO accounts VALUES (DEFAULT, 'b@b', 'b', 'User');
+INSERT INTO users VALUES (0, 'Administrator');
+INSERT INTO users VALUES (1, 'User');
 
-CREATE TABLE users (
-  email VARCHAR(100) REFERENCES accounts(email),
+CREATE TABLE registered_users (
+  user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+  email VARCHAR(100) NOT NULL UNIQUE,
+  username VARCHAR(100) NOT NULL,
+  password VARCHAR(100) NOT NULL,
   name VARCHAR(100),
   surname VARCHAR(100),
-  address VARCHAR(100),
+  location VARCHAR(100),
+  avatar_url VARCHAR(100)
 );
 
-INSERT INTO users VALUES ('a@a', 'A-name', 'A-surname', 'A-Empty Street');
-INSERT INTO users VALUES ('b@b', 'B-name', 'B-surname', 'B-Empty Street');
+INSERT INTO registered_users VALUES (0, 'a@a', 'a', 'a', 'admin', 'adminovich', NULL, '');
+INSERT INTO registered_users VALUES (1, 'b@b', 'b', 'b', NULL, NULL, NULL, '');
 
 CREATE TABLE facebook_users (
-  user_id INTEGER NOT NULL UNIQUE REFERENCES accounts(id),
+  user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
   id VARCHAR(100) PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  cover_url VARCHAR(1000) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  avatar_url VARCHAR(1000) NOT NULL,
   access_token VARCHAR(1000) NOT NULL
 );
 
@@ -49,4 +52,5 @@ CREATE TABLE facebook_users (
 
 DROP TABLE task;
 DROP TABLE users;
+DROP TABLE registered_users;
 DROP TABLE facebook_users;

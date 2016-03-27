@@ -1,25 +1,27 @@
-package controllers
+package config
 
+import controllers.routes
 import jp.t2v.lab.play2.auth._
-import model.user.Role.{Administrator, User}
-import model.user.{UserDAOTrait, Account, Role}
 import play.api.mvc.Results._
 import play.api.mvc._
+import model.user.access.Role
+import model.user.access.Role.{Administrator, BlockedUser, User}
+import model.user.dao.UserDAO
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.{ClassTag, classTag}
 
-trait AuthConfigImpl extends AuthConfig {
+trait AuthConfiguration extends AuthConfig {
 
   type Id = Long
-  type User = Account
+  type User = model.user.User
   type Authority = Role
 
-  val userDAO: UserDAOTrait
+  val userDAO: UserDAO
 
   val idTag: ClassTag[Id] = classTag[Id]
   val sessionTimeoutInSeconds: Int = 3600
-  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userDAO.findUser(id)
+  def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userDAO.get(id)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
     val uri = request.session.get("access_uri").getOrElse(routes.Tasks.allTasks().url.toString)
@@ -30,7 +32,7 @@ trait AuthConfigImpl extends AuthConfig {
     Future.successful(Redirect(routes.Tasks.allTasks()))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(routes.Sessions.login()).withSession("access_uri" -> request.uri))
+    Future.successful(Redirect(controllers.auth.login.routes.AuthController.login()).withSession("access_uri" -> request.uri))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] = {
     Future.successful(Forbidden("no permission"))
@@ -40,6 +42,7 @@ trait AuthConfigImpl extends AuthConfig {
     (user.role, authority) match {
       case ( Administrator, _ ) => true
       case ( User, User ) => true
+      case ( BlockedUser, BlockedUser ) => true
       case _              => false
     }
   }

@@ -1,6 +1,5 @@
-@import model.user.Account
-@import model.user.FacebookUser
-@(form: Form[Option[Account]], facebookUser: Option[FacebookUser])(implicit messages: Messages, flash: Flash)
+@import controllers.auth.login.AuthData
+@(form: Form[AuthData])(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 
 <html>
@@ -12,7 +11,7 @@
     <body>
 
 
-       @helper.form(controllers.routes.Sessions.authenticate) {
+       @helper.form(controllers.auth.login.routes.AuthController.authenticate) {
             @flash.get("success").map { message =>
                 <p class="success">
                     @message
@@ -50,9 +49,9 @@
                                 </div>
                                 <div class="form-group">
                                     <button type="submit" value="login" class="btn btn-primary btn-lg btn-block">Sign In</button>
-                                    <a type="button" href="@routes.FacebookAuthController.login("email")"
+                                    <a type="button" href="@controllers.auth.login.routes.FacebookAuthController.login("email")"
                                     class="btn btn-primary btn-lg btn-block">Facebook login</a>
-                                    <a type="button" href="@routes.Registration.registration()"
+                                    <a type="button" href="@controllers.auth.registration.routes.RegistrationController.registration()"
                                     class="btn btn-primary btn-lg btn-block btn-red">Register</a>
                                 </div>
                             </form>

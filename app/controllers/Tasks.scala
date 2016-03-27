@@ -4,30 +4,32 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import javax.inject.Inject
 
+import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
-import model.user.{Account, UserDAO}
 import play.api.i18n.{I18nSupport, MessagesApi}
-import model.user.Role.{Administrator, User}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
+import model.user.access.Role.{Administrator, User}
+import model.user.dao.UserDAO
 
 import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
 class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
-  extends Controller with AuthElement with AuthConfigImpl with I18nSupport {
+  extends Controller with AuthElement with AuthConfiguration with I18nSupport {
 
   def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
-    val user: Account = loggedIn
-    val tasks = taskDAO getAll
-    val account = userDAO getUser user
+    val user: Option[User] = Some(loggedIn)
 
-    tasks zip account map {
-      case (t, a) => Ok(views.html.index(t)(a))
+    val tasks = taskDAO getAll
+
+    tasks map {
+      case t => Ok(views.html.index(t)(user))
     }
   }
 
@@ -89,6 +91,6 @@ class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: M
     )(TaskForm.apply)(TaskForm.unapply)
   )
 
-//  protected implicit def template(implicit user: User): String => Html => Html = html.main(user)
+//  protected implicit def template(implicit model.user: User): String => Html => Html = html.main(model.user)
 }
 

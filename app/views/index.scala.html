@@ -1,17 +1,17 @@
 @import model.task.Task
 @import controllers.routes
-@import model.user.UserModel
-@import model.user.Role
-@(tasks: Seq[Task])(implicit user: Option[UserModel])
+@import model.user.access.Role
+@import model.user.User
+@(tasks: Seq[Task])(implicit user: Option[User])
+@import helper._
 
     <div>
         @if(user.isDefined) {
-            @user.map(u => u.user.email).getOrElse("")
+            @user.map(u => u.role).getOrElse("")
             }
 
     </div>
 
-    @import helper._
     @main("Todo list") {
 
         <div class="container">
@@ -24,7 +24,7 @@
                                     <h3 class="panel-title">@tasks.size idea</h3>
                                 </div>
                                 <div class="col col-xs-6 text-right">
-                                @form(routes.Tasks.addTask) {
+                                @form(controllers.routes.Tasks.addTask) {
                                     <button type="submit" class="btn btn-sm btn-primary btn-create">Create New</button>
                                 }
                                 </div>
@@ -62,7 +62,7 @@
                                             @if(!task.ready) {
                                                 <a type="button" href="@routes.Tasks.completeTask(task.id)" class="btn btn-success">Complete</a>
                                             }
-                                            @if(user.exists(_.account.role == Role.Administrator)) {
+                                            @if(user.exists(_.role == Role.Administrator)) {
                                                 <a type="button" href="@routes.Tasks.deleteTask(task.id)" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
                                             }
                                         </div>

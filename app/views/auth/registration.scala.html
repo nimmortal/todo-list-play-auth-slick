@@ -1,3 +1,4 @@
+@import controllers.auth.registration.LoginForm
 @(form: Form[LoginForm])(implicit messages: Messages, flash: Flash)
 <!DOCTYPE html>
 
@@ -30,7 +31,7 @@
                             });
                     </script>
 
-                @helper.form(controllers.routes.Registration.registration) {
+                @helper.form(controllers.auth.registration.routes.RegistrationController.registration) {
                     @flash.get("success").map { message =>
                         <p class="success">
                             @message

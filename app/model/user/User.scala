@@ -1,6 +1,5 @@
 package model.user
 
-case class User(email: String,
-                name: String,
-                surname: String,
-                address: String)
+import model.user.access.Role
+
+case class User(id: Long, role: Role)

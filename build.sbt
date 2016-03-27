@@ -13,8 +13,8 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   "com.h2database" % "h2" % "1.3.176",
   "com.typesafe.slick" %% "slick" % "3.1.1",
-  "com.typesafe.play" %% "play-slick" % "1.1.1",
-  "com.typesafe.play" %% "play-slick-evolutions" % "1.1.1",
+  "com.typesafe.play" %% "play-slick" % "2.0.0",
+  "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
   "jp.t2v" %% "play2-auth"        % "0.14.2",
   "jp.t2v" %% "play2-auth-social" % "0.14.2", // for social login
   "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test"
