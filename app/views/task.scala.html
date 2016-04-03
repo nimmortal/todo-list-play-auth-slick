@@ -1,5 +1,6 @@
 @import helper._
-@(id: Option[Long], taskForm: Form[TaskForm])(implicit messages: Messages, flash: Flash)
+@import model.user.UserView
+@(id: Option[Long], taskForm: Form[TaskForm])(implicit userView: UserView, messages: Messages, flash: Flash)
 
 <h2>Add a new idea</h2>
 

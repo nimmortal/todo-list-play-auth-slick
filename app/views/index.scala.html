@@ -1,16 +1,9 @@
 @import model.task.Task
 @import controllers.routes
 @import model.user.access.Role
-@import model.user.User
-@(tasks: Seq[Task])(implicit user: Option[User])
+@import model.user.UserView
+@(tasks: Seq[Task])(implicit userView: UserView)
 @import helper._
-
-    <div>
-        @if(user.isDefined) {
-            @user.map(u => u.role).getOrElse("")
-            }
-
-    </div>
 
     @main("Todo list") {
 
@@ -62,7 +55,7 @@
                                             @if(!task.ready) {
                                                 <a type="button" href="@routes.Tasks.completeTask(task.id)" class="btn btn-success">Complete</a>
                                             }
-                                            @if(user.exists(_.role == Role.Administrator)) {
+                                            @if(userView.role == Role.Administrator) {
                                                 <a type="button" href="@routes.Tasks.deleteTask(task.id)" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
                                             }
                                         </div>

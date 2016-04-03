@@ -1,5 +1,6 @@
 @import helper._
-@(title: String)(content: Html)
+@import model.user.UserView
+@(title: String)(content: Html)(implicit userView: UserView)
 <!DOCTYPE html>
 
 <html lang="en">
@@ -7,14 +8,69 @@
         <title>@title</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/bootstrap.min.css")">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.versioned("stylesheets/table.css")">
         <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.versioned("javascripts/jquery-2.2.1.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/bootstrap.min.js")" type="text/javascript"></script>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     </head>
     <body>
-        @form(controllers.auth.login.routes.AuthController.logout) {
-            <input type="submit"  value="Logout" class="btn btn-default">
-            }
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Brand</a>
+                </div>
+
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <form class="navbar-form" role="search">
+                            <div id="imaginary_container">
+                                <div class="input-group stylish-input-group">
+                                    <input type="text" class="form-control"  placeholder="Search" >
+                                    <span class="input-group-addon">
+                                        <button type="submit">
+                                            <span class="glyphicon glyphicon-search"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                aria-haspopup="true" aria-expanded="false">
+                                @userView.username
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="@controllers.auth.login.routes.AuthController.logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
         @content
     </body>

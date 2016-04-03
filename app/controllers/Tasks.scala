@@ -7,6 +7,7 @@ import javax.inject.Inject
 import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
+import model.user.{UserService, UserView}
 import play.api.i18n.{I18nSupport, MessagesApi}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,35 +15,39 @@ import play.api.data.Forms._
 import play.api.data._
 import play.api.mvc._
 import model.user.access.Role.{Administrator, User}
-import model.user.dao.UserDAO
+import model.user.dao.{FacebookDAO, UserDAO}
 
 import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
-class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
+class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
   extends Controller with AuthElement with AuthConfiguration with I18nSupport {
 
-  def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
-    val user: Option[User] = Some(loggedIn)
+  val userView: (Long => UserView) = id => userService.getUserView(id)
 
+  def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
     val tasks = taskDAO getAll
 
-    tasks map {
-      case t => Ok(views.html.index(t)(user))
-    }
+    tasks map(t => Ok(views.html.index(t)(userView(loggedIn.id))))
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
-    Ok(views.html.task(None, taskForm))
+      implicit val user = userView(loggedIn.id)
+
+      Ok(views.html.task(None, taskForm))
   }
 
   def editTask(id: Long) = AsyncStack(AuthorityKey -> User) { implicit request =>
+    implicit val user = userView(loggedIn.id)
+
     val task = taskDAO get id
     task.map(t => Ok(views.html.task(Some(id), taskForm.fill(TaskForm(t.get.label, t.get.owner)))))
   }
 
   def newTask = StackAction(AuthorityKey -> User) { implicit request =>
+    implicit val user = userView(loggedIn.id)
+
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(None, errors)),
       data => {
@@ -57,6 +62,8 @@ class Tasks @Inject()(taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: M
   }
 
   def updateTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
+    implicit val user = userView(loggedIn.id)
+
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(Some(id), errors)),
       data => {
