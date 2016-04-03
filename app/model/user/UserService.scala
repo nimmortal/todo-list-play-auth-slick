@@ -3,7 +3,7 @@ package model.user
 import javax.inject.Inject
 
 import model.user.dao.{FacebookDAO, RegisteredUserDAO, UserDAO}
-import play.api.cache.CacheApi
+import play.api.cache.{CacheApi, NamedCache}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -12,10 +12,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class UserService @Inject()(userDAO: UserDAO,
                             registeredUserDAO: RegisteredUserDAO,
                             facebookDAO: FacebookDAO,
-                            cache: CacheApi) {
+                            @NamedCache("user-cache") sessionCache: CacheApi) {
 
   def getUserView(userId: Long) : UserView = {
-    val maybeUser: Option[UserView] = cache.get[UserView](userId.toString)
+    val maybeUser: Option[UserView] = sessionCache.get[UserView](userId.toString)
 
     maybeUser.getOrElse {
       val registeredUser = registeredUserDAO.get(userId)
@@ -34,14 +34,14 @@ class UserService @Inject()(userDAO: UserDAO,
       }
 
       val userViewResult = Await.result(userView, Duration.Inf)
-      cache.set(userId.toString, userViewResult)
+      sessionCache.set(userId.toString, userViewResult)
       userViewResult
     }
 
   }
 
   def removeUserView(userId: Long): Unit = {
-    cache.remove(userId.toString)
+    sessionCache.remove(userId.toString)
   }
 
 }

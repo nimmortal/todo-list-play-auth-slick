@@ -1,3 +1,5 @@
 package model.task
 
-case class Task(id: Long, label: String, owner: String, myTime: String, ready: Boolean)
+import java.time.LocalDateTime
+
+case class Task(id: Long, label: String, owner: String, created: LocalDateTime, ready: Boolean)

@@ -6,7 +6,7 @@ CREATE TABLE task (
   id     INTEGER AUTO_INCREMENT PRIMARY KEY,
   label  VARCHAR(2000),
   who    VARCHAR(40),
-  mytime VARCHAR(100),
+  created TIMESTAMP,
   ready  BOOLEAN
 );
 

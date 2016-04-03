@@ -1,7 +1,6 @@
 package controllers
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalDateTime
 import javax.inject._
 
 import config.AuthConfiguration
@@ -52,11 +51,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(None, errors)),
       data => {
-        val today = Calendar.getInstance().getTime
-        val timeFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
-        val time = timeFormat.format(today)
-
-        taskDAO.create(data.label, data.owner, time)
+        taskDAO.create(data.label, data.owner, LocalDateTime.now())
         Redirect(routes.Tasks.allTasks())
       }
     )
@@ -70,7 +65,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
       data => {
         val oldTask = taskDAO get id
 
-        oldTask.map(t => taskDAO.update(new Task(id, data.label, data.owner, t.get.myTime, t.get.ready)))
+        oldTask.map(t => taskDAO.update(new Task(id, data.label, data.owner, t.get.created, t.get.ready)))
         Redirect(routes.Tasks.allTasks())
       }
     )
