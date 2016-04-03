@@ -1,17 +1,12 @@
 package model.task.tabels
 
-import java.sql.Timestamp
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.LocalDateTime
 
 import model.task.Task
+import model.util.columns.DateTimeColumns
 import slick.driver.H2Driver.api._
 
-class TasksTable(tag: Tag) extends Table[Task](tag, "task") {
-
-  implicit val localDateTimeColumnType = MappedColumnType.base[LocalDateTime, Timestamp](
-    d => Timestamp.from(d.toInstant(ZoneOffset.ofHours(0))),
-    d => d.toLocalDateTime
-  )
+class TasksTable(tag: Tag) extends Table[Task](tag, "task") with DateTimeColumns {
 
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
   def label = column[String]("label")
