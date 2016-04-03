@@ -1,6 +1,6 @@
 package controllers.auth.login
 
-import javax.inject.Inject
+import javax.inject._
 
 import config.AuthConfiguration
 import controllers.routes
@@ -15,6 +15,7 @@ import model.user.dao.{FacebookDAO, UserDAO}
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: FacebookDAO, loginService: LoginService, val messagesApi: MessagesApi)
   extends FacebookController
   with AuthConfiguration

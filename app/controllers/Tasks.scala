@@ -2,7 +2,7 @@ package controllers
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import javax.inject.Inject
+import javax.inject._
 
 import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.AuthElement
@@ -21,6 +21,7 @@ import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
+@Singleton
 class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
   extends Controller with AuthElement with AuthConfiguration with I18nSupport {
 

@@ -1,10 +1,11 @@
 package controllers.auth.login
 
-import javax.inject.Inject
+import javax.inject._
 
 import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
 import model.auth.LoginService
+import model.user.UserService
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -17,8 +18,10 @@ import scala.concurrent.Future
 
 case class AuthData(login: String, password: String)
 
-class AuthController @Inject()(userService: LoginService, val userDAO: UserDAO, val messagesApi: MessagesApi)
+@Singleton
+class AuthController @Inject()(loginService: LoginService, userService: UserService, val userDAO: UserDAO, val messagesApi: MessagesApi)
   extends Controller with OptionalAuthElement with LoginLogout with AuthConfiguration with I18nSupport {
+
 
   val index = Action { implicit request =>
     Redirect(controllers.routes.Tasks.allTasks())
@@ -48,7 +51,7 @@ class AuthController @Inject()(userService: LoginService, val userDAO: UserDAO, 
     loginForm.bindFromRequest.fold(
       formWithErrors => Future.successful(BadRequest(html.auth.login(formWithErrors))),
       form           =>  {
-        userService.authenticate(form.login, form.password).flatMap { user =>
+        loginService.authenticate(form.login, form.password).flatMap { user =>
           user.map { u =>
             gotoLoginSucceeded(u.id)
           } getOrElse {

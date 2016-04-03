@@ -2,9 +2,9 @@
 @import model.user.UserView
 @(id: Option[Long], taskForm: Form[TaskForm])(implicit userView: UserView, messages: Messages, flash: Flash)
 
-<h2>Add a new idea</h2>
-
 @main(if (id.isEmpty) "Add new task" else "Edit task") {
+    <h2>Add a new idea</h2>
+
     @if(id.isEmpty) {
         @form(routes.Tasks.newTask) {
 

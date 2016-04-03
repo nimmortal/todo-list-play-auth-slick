@@ -1,6 +1,6 @@
 package controllers.auth.registration
 
-import javax.inject.Inject
+import javax.inject._
 
 import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.{AuthenticationElement, Login}
@@ -15,6 +15,7 @@ import model.user.dao.UserDAO
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+@Singleton
 class RegistrationController @Inject()(val userDAO: UserDAO, val messagesApi: MessagesApi, registrationService: RegistrationService)
   extends Controller with AuthenticationElement with Login with AuthConfiguration with I18nSupport {
 
