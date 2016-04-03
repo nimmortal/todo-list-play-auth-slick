@@ -41,7 +41,9 @@ class AuthController @Inject()(loginService: LoginService, userService: UserServ
       Ok(html.auth.login(loginForm))
   }
 
-  def logout = Action.async { implicit request =>
+  def logout = AsyncStack { implicit request =>
+    loggedIn.foreach(u => userService.removeUserView(u.id))
+
     gotoLogoutSucceeded.map(_.flashing(
       "success" -> "You've been logged out"
     ).removingFromSession("rememberme"))

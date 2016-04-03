@@ -25,7 +25,7 @@ class UserService @Inject()(userDAO: UserDAO,
         maybeUser.map { u =>
           registeredUser zip facebookUser map {
             case (Some(r), None) => new UserView(r.username, "", u.role)
-            case (None, Some(f)) => new UserView(f.name, "", u.role)
+            case (None, Some(f)) => new UserView(f.name, f.avatar, u.role)
             case _ => throw new Exception("user operations")
           }
         } getOrElse {
