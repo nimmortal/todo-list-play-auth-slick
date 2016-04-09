@@ -24,12 +24,12 @@ trait AuthConfiguration extends AuthConfig {
   def resolveUser(id: Id)(implicit ctx: ExecutionContext): Future[Option[User]] = userDAO.get(id)
 
   def loginSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] = {
-    val uri = request.session.get("access_uri").getOrElse(routes.Tasks.allTasks().url.toString)
+    val uri = request.session.get("access_uri").getOrElse(routes.Tasks.getTaskPage().url.toString)
     Future.successful(Redirect(uri).withSession(request.session - "access_uri"))
   }
 
   def logoutSucceeded(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(routes.Tasks.allTasks()))
+    Future.successful(Redirect(routes.Tasks.getTaskPage()))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
     Future.successful(Redirect(controllers.auth.login.routes.AuthController.login()).withSession("access_uri" -> request.uri))

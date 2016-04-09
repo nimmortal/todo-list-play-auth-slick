@@ -15,7 +15,7 @@ import scala.concurrent.Future
 trait RegisteredUserDAO {
   def get(id: Long) : Future[Option[RegisteredUser]]
   def find(email: String) : Future[Option[RegisteredUser]]
-  def find(email: String, pass: String) : Future[Option[RegisteredUser]]
+  def find(login: String, pass: String) : Future[Option[RegisteredUser]]
   def save(registeredUser: RegisteredUser) : Future[Int]
   def save(user: RegisteredUserDTO): Future[Int]
 }
@@ -29,9 +29,9 @@ class RegisteredUserDAOImpl @Inject()(val dbConfigProvider: DatabaseConfigProvid
 
   override def find(email: String): Future[Option[RegisteredUser]] = db.run(users.filter(_.email === email).result.headOption)
 
-  override def find(email: String, pass: String): Future[Option[RegisteredUser]] = {
+  override def find(login: String, pass: String): Future[Option[RegisteredUser]] = {
     val findUser = users.filter { u =>
-      u.email === email && u.password === pass
+      (u.email === login || u.username === login) && u.password === pass
     }
 
     db.run(findUser.result.headOption)

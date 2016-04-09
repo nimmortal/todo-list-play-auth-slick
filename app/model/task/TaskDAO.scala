@@ -1,14 +1,16 @@
 package model.task
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
 import model.task.tabels.TasksTable
+import model.util.Page
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton()
 class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
@@ -19,6 +21,17 @@ class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   def get(id: Long): Future[Option[Task]] = db.run(tasks.filter(_.id === id).result.headOption)
 
   def getAll: Future[Seq[Task]] = db.run(tasks.result)
+
+  def getTaskPage(page: Int = 1, limit: Int = 10): Future[Page[Task]] = {
+    val offset = page * limit
+
+    val q = tasks.drop(offset).take(limit).result
+    db.run(q).map {
+      case tasks: Seq[Task] => new Page[Task](tasks, limit, offset + 1, tasks.size)
+    }
+  }
+
+  def getSize: Future[Int] = db.run(tasks.length.result)
 
   def create(label: String, owner: String, time: LocalDateTime): Future[Long] = {
     val taskId = (tasks returning tasks.map(_.id)) += new Task(0, label, owner, time, false)

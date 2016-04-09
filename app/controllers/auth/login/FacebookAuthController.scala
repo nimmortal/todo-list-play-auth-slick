@@ -48,7 +48,7 @@ class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: Fa
     retrieveProviderUser(token).map { providerUser =>
 //      facebookDAO.save(consumerUser.id,
 //        new model.user.FacebookUser(0L, providerUser.id, providerUser.name, providerUser.coverUrl, providerUser.accessToken))
-      Redirect(controllers.routes.Tasks.allTasks())
+      Redirect(controllers.routes.Tasks.getTaskPage())
     }
   }
 

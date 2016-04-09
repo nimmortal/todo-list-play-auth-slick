@@ -20,7 +20,7 @@ GET     /authorize/facebook         controllers.auth.login.FacebookAuthControlle
 
 # Tasks
 GET     /task                       controllers.Tasks.addTask
-GET     /tasks                      controllers.Tasks.allTasks
+GET     /tasks                      controllers.Tasks.getTaskPage(page: Int ?= 1)
 POST    /tasks                      controllers.Tasks.newTask
 GET     /task/:id                   controllers.Tasks.editTask(id: Long)
 POST    /task/:id                   controllers.Tasks.updateTask(id: Long)

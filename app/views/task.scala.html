@@ -22,7 +22,7 @@
 
             <input type="submit" value="Create" class="btn primary">
             or
-            <a href="@routes.Tasks.allTasks()" class="btn">Cancel</a>
+            <a href="@routes.Tasks.getTaskPage()" class="btn">Cancel</a>
         }
     } else {
         @form(routes.Tasks.updateTask(id.get)) {
@@ -38,7 +38,7 @@
 
             <input type="submit" value="Update" class="btn primary">
             or
-            <a href="@routes.Tasks.allTasks()" class="btn">Cancel</a>
+            <a href="@routes.Tasks.getTaskPage()" class="btn">Cancel</a>
         }
     }
 }

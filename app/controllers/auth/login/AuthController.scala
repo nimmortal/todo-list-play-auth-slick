@@ -16,7 +16,7 @@ import views.html
 
 import scala.concurrent.Future
 
-case class AuthData(login: String, password: String)
+case class AuthForm(login: String, password: String)
 
 @Singleton
 class AuthController @Inject()(loginService: LoginService, userService: UserService, val userDAO: UserDAO, val messagesApi: MessagesApi)
@@ -24,21 +24,22 @@ class AuthController @Inject()(loginService: LoginService, userService: UserServ
 
 
   val index = Action { implicit request =>
-    Redirect(controllers.routes.Tasks.allTasks())
+    Redirect(controllers.routes.Tasks.getTaskPage())
   }
 
   val loginForm = Form {
     mapping(
-      "login" -> email.verifying("email.empty", s => !s.isEmpty),
-      "password" -> text.verifying("password.empty", s => !s.isEmpty)
-    )(AuthData.apply)(AuthData.unapply)
+      "login" -> text.verifying("empty.login", s => !s.isEmpty),
+      "password" -> text.verifying("empty.password", s => !s.isEmpty)
+    )(AuthForm.apply)(AuthForm.unapply)
   }
 
   def login = StackAction { implicit request =>
-    if (loggedIn.isDefined)
-      Redirect(controllers.routes.Tasks.allTasks())
-    else
+    loggedIn.fold {
       Ok(html.auth.login(loginForm))
+    } { _ =>
+      Redirect(controllers.routes.Tasks.getTaskPage())
+    }
   }
 
   def logout = AsyncStack { implicit request =>

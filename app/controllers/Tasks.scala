@@ -15,6 +15,7 @@ import play.api.data._
 import play.api.mvc._
 import model.user.access.Role.{Administrator, User}
 import model.user.dao.{FacebookDAO, UserDAO}
+import model.util.Page
 
 import scala.language.postfixOps
 
@@ -26,10 +27,10 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
 
   val userView: (Long => UserView) = id => userService.getUserView(id)
 
-  def allTasks = AsyncStack(AuthorityKey -> User) { implicit request =>
-    val tasks = taskDAO getAll
+  def getTaskPage(page: Int) = AsyncStack(AuthorityKey -> User) { implicit request =>
+    val taskPage = taskDAO.getTaskPage(page - 1, 5)
 
-    tasks map(t => Ok(views.html.index(t)(userView(loggedIn.id))))
+    taskPage.map(p => Ok(views.html.index(p)(userView(loggedIn.id))))
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
@@ -52,7 +53,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
       errors => BadRequest(views.html.task(None, errors)),
       data => {
         taskDAO.create(data.label, data.owner, LocalDateTime.now())
-        Redirect(routes.Tasks.allTasks())
+        Redirect(routes.Tasks.getTaskPage())
       }
     )
   }
@@ -66,7 +67,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
         val oldTask = taskDAO get id
 
         oldTask.map(t => taskDAO.update(new Task(id, data.label, data.owner, t.get.created, t.get.ready)))
-        Redirect(routes.Tasks.allTasks())
+        Redirect(routes.Tasks.getTaskPage())
       }
     )
   }
@@ -76,7 +77,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
 
     task.map(optTask => optTask.foreach(task => taskDAO.delete(task)))
 
-    Redirect(routes.Tasks.allTasks())
+    Redirect(routes.Tasks.getTaskPage())
   }
 
   def completeTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
@@ -84,7 +85,7 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
 
     task.map(optTask => optTask.foreach(task => taskDAO.complete(task)))
 
-    Redirect(routes.Tasks.allTasks())
+    Redirect(routes.Tasks.getTaskPage())
   }
 
   val taskForm = Form(
