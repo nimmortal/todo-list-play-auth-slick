@@ -15,7 +15,6 @@ import play.api.data._
 import play.api.mvc._
 import model.user.access.Role.{Administrator, User}
 import model.user.dao.{FacebookDAO, UserDAO}
-import model.util.Page
 
 import scala.language.postfixOps
 
@@ -27,10 +26,12 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
 
   val userView: (Long => UserView) = id => userService.getUserView(id)
 
-  def getTaskPage(page: Int) = AsyncStack(AuthorityKey -> User) { implicit request =>
-    val taskPage = taskDAO.getTaskPage(page - 1, 5)
+  def getTaskPage(page: Int, filter: String) = AsyncStack(AuthorityKey -> User) { implicit request =>
+    val taskPage = taskDAO.getTaskPageFiltered(page - 1, 5, filter)
 
-    taskPage.map(p => Ok(views.html.index(p)(userView(loggedIn.id))))
+    taskPage.map(p => {
+      Ok(views.html.index(p)(userView(loggedIn.id)))
+    })
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>

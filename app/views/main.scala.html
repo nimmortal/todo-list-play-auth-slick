@@ -1,6 +1,6 @@
 @import helper._
 @import model.user.UserView
-@(title: String)(content: Html)(implicit userView: UserView)
+@(title: String, filter: Option[String])(content: Html)(implicit userView: UserView)
 <!DOCTYPE html>
 
 <html lang="en">
@@ -34,18 +34,18 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
                     <div class="col-sm-6 col-sm-offset-3">
-                        <form class="navbar-form" role="search">
-                            <div id="imaginary_container">
-                                <div class="input-group stylish-input-group">
-                                    <input type="text" class="form-control"  placeholder="Search" >
-                                    <span class="input-group-addon">
-                                        <button type="submit">
-                                            <span class="glyphicon glyphicon-search"></span>
-                                        </button>
-                                    </span>
-                                </div>
+                    @helper.form(controllers.routes.Tasks.getTaskPage()) {
+                        <div id="imaginary_container">
+                            <div class="input-group stylish-input-group" style="padding-top: 8px">
+                                <input name="filter" value="@filter.map(f => f)" type="text" class="form-control" placeholder="Search">
+                                <span class="input-group-addon">
+                                    <button type="submit">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
                             </div>
-                        </form>
+                        </div>
+                    }
                     </div>
 
                     <ul class="nav navbar-nav navbar-right">

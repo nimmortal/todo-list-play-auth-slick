@@ -18,20 +18,34 @@ class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
 
   val tasks = TableQuery[TasksTable]
 
+  def filteredTasks(filter: String = "") = tasks.filter(_.label like ("%" ++ filter ++ "%"))
+
   def get(id: Long): Future[Option[Task]] = db.run(tasks.filter(_.id === id).result.headOption)
 
   def getAll: Future[Seq[Task]] = db.run(tasks.result)
 
   def getTaskPage(page: Int = 1, limit: Int = 10): Future[Page[Task]] = {
     val offset = page * limit
+    val size = getSize()
 
     val q = tasks.drop(offset).take(limit).result
-    db.run(q).map {
-      case tasks: Seq[Task] => new Page[Task](tasks, limit, offset + 1, tasks.size)
+    db.run(q).flatMap {
+      case tasks: Seq[Task] => size.map(s => new Page[Task](tasks, limit, offset + 1, s, None))
     }
   }
 
-  def getSize: Future[Int] = db.run(tasks.length.result)
+  def getTaskPageFiltered(page: Int = 1, limit: Int = 10, filter: String) : Future[Page[Task]] = {
+    val offset = page * limit
+    val size = getSize(filter)
+
+    val q = filteredTasks(filter).drop(offset).take(limit).result
+
+    db.run(q).flatMap {
+      case tasks: Seq[Task] => size.map(s => new Page[Task](tasks, limit, offset + 1, s, Some(filter)))
+    }
+  }
+
+  def getSize(filter: String = "%"): Future[Int] = db.run(filteredTasks(filter).length.result)
 
   def create(label: String, owner: String, time: LocalDateTime): Future[Long] = {
     val taskId = (tasks returning tasks.map(_.id)) += new Task(0, label, owner, time, false)
