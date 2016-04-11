@@ -15,6 +15,8 @@ import model.user.dao.UserDAO
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+case class RegForm(login: String, email: String, password: String)
+
 @Singleton
 class RegistrationController @Inject()(val userDAO: UserDAO, val messagesApi: MessagesApi, registrationService: RegistrationService)
   extends Controller with AuthenticationElement with Login with AuthConfiguration with I18nSupport {
@@ -24,7 +26,7 @@ class RegistrationController @Inject()(val userDAO: UserDAO, val messagesApi: Me
       "username" -> text.verifying("username.empty", s => !s.isEmpty),
       "email" -> email.verifying("email.empty", s => !s.isEmpty),
       "password" -> text.verifying("password.empty", s => !s.isEmpty)
-    )(LoginForm.apply)(LoginForm.unapply)
+    )(RegForm.apply)(RegForm.unapply)
   }
 
   def goToRegistration = Action { implicit request =>
