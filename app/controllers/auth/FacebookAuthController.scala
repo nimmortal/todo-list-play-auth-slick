@@ -1,17 +1,16 @@
-package controllers.auth.login
+package controllers.auth
 
 import javax.inject._
 
 import config.AuthConfiguration
-import controllers.routes
 import jp.t2v.lab.play2.auth.social.providers.facebook.{FacebookController, FacebookProviderUserSupport, FacebookUser}
 import model.auth.LoginService
+import model.user.dao.{FacebookDAO, UserDAO}
 import play.api.Logger
 import play.api.Play.current
 import play.api.i18n.MessagesApi
 import play.api.libs.ws.{WS, WSResponse}
 import play.api.mvc.{RequestHeader, Result}
-import model.user.dao.{FacebookDAO, UserDAO}
 
 import scala.concurrent.{ExecutionContext, Future}
 

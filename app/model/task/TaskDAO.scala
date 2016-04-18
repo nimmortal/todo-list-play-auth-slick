@@ -9,8 +9,8 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton()
 class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
@@ -48,7 +48,7 @@ class TaskDAO @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   def getSize(filter: String = "%"): Future[Int] = db.run(filteredTasks(filter).length.result)
 
   def create(label: String, owner: String, time: LocalDateTime): Future[Long] = {
-    val taskId = (tasks returning tasks.map(_.id)) += new Task(0, label, owner, time, false)
+    val taskId = (tasks returning tasks.map(_.id)) += new Task(None, label, owner, time, false)
     db.run(taskId)
   }
 

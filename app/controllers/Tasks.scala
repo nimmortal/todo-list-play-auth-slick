@@ -6,22 +6,25 @@ import javax.inject._
 import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.AuthElement
 import model.task.{Task, TaskDAO}
-import model.user.{UserService, UserView}
-import play.api.i18n.{I18nSupport, MessagesApi}
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.data.Forms._
-import play.api.data._
-import play.api.mvc._
 import model.user.access.Role.{Administrator, User}
 import model.user.dao.{FacebookDAO, UserDAO}
+import model.user.{UserService, UserView}
+import play.api.data.Forms._
+import play.api.data._
+import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.mvc._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
 case class TaskForm(label: String, owner: String)
 
 @Singleton
-class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO: TaskDAO, val userDAO: UserDAO, val messagesApi: MessagesApi)
+class Tasks @Inject()(userService: UserService,
+                      facebookDAO: FacebookDAO,
+                      taskDAO: TaskDAO,
+                      val userDAO: UserDAO,
+                      val messagesApi: MessagesApi)
   extends Controller with AuthElement with AuthConfiguration with I18nSupport {
 
   val userView: (Long => UserView) = id => userService.getUserView(id)
@@ -30,25 +33,25 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
     val taskPage = taskDAO.getTaskPageFiltered(page - 1, 5, filter)
 
     taskPage.map(p => {
-      Ok(views.html.index(p)(userView(loggedIn.id)))
+      Ok(views.html.index(p)(userView(loggedIn.id.get)))
     })
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
-      implicit val user = userView(loggedIn.id)
+      implicit val user = userView(loggedIn.id.get)
 
       Ok(views.html.task(None, taskForm))
   }
 
   def editTask(id: Long) = AsyncStack(AuthorityKey -> User) { implicit request =>
-    implicit val user = userView(loggedIn.id)
+    implicit val user = userView(loggedIn.id.get)
 
     val task = taskDAO get id
     task.map(t => Ok(views.html.task(Some(id), taskForm.fill(TaskForm(t.get.label, t.get.owner)))))
   }
 
   def newTask = StackAction(AuthorityKey -> User) { implicit request =>
-    implicit val user = userView(loggedIn.id)
+    implicit val user = userView(loggedIn.id.get)
 
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(None, errors)),
@@ -60,14 +63,14 @@ class Tasks @Inject()(userService: UserService, facebookDAO: FacebookDAO,taskDAO
   }
 
   def updateTask(id: Long) = StackAction(AuthorityKey -> User) { implicit request =>
-    implicit val user = userView(loggedIn.id)
+    implicit val user = userView(loggedIn.id.get)
 
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(Some(id), errors)),
       data => {
         val oldTask = taskDAO get id
 
-        oldTask.map(t => taskDAO.update(new Task(id, data.label, data.owner, t.get.created, t.get.ready)))
+        oldTask.map(t => taskDAO.update(new Task(Some(id), data.label, data.owner, t.get.created, t.get.ready)))
         Redirect(routes.Tasks.getTaskPage())
       }
     )

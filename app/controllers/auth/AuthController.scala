@@ -1,4 +1,4 @@
-package controllers.auth.login
+package controllers.auth
 
 import javax.inject._
 
@@ -6,12 +6,12 @@ import config.AuthConfiguration
 import jp.t2v.lab.play2.auth.{LoginLogout, OptionalAuthElement}
 import model.auth.LoginService
 import model.user.UserService
+import model.user.dao.UserDAO
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, Controller}
-import model.user.dao.UserDAO
 import views.html
 
 import scala.concurrent.Future
@@ -43,7 +43,7 @@ class AuthController @Inject()(loginService: LoginService, userService: UserServ
   }
 
   def logout = AsyncStack { implicit request =>
-    loggedIn.foreach(u => userService.removeUserView(u.id))
+    loggedIn.foreach(u => userService.removeUserView(u.id.get))
 
     gotoLogoutSucceeded.map(_.flashing(
       "success" -> "You've been logged out"
@@ -56,7 +56,7 @@ class AuthController @Inject()(loginService: LoginService, userService: UserServ
       form           =>  {
         loginService.authenticate(form.login, form.password).flatMap { user =>
           user.map { u =>
-            gotoLoginSucceeded(u.id)
+            gotoLoginSucceeded(u.id.get)
           } getOrElse {
             Future.successful(BadRequest(html.auth.login(loginForm.withGlobalError("error.login"))))
           }

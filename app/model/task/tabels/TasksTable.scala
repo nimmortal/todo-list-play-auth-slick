@@ -14,5 +14,5 @@ class TasksTable(tag: Tag) extends Table[Task](tag, "task") with DateTimeColumns
   def created = column[LocalDateTime]("created")
   def ready = column[Boolean]("ready")
 
-  def * = (id, label, who, created, ready) <> ((Task.apply _).tupled, Task.unapply)
+  def * = (id.?, label, who, created, ready) <> ((Task.apply _).tupled, Task.unapply)
 }

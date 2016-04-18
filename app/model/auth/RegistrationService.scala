@@ -2,32 +2,29 @@ package model.auth
 
 import javax.inject.Inject
 
+import model.user.User
 import model.user.access.Role
 import model.user.dao.{RegisteredUserDAO, UserDAO}
-import model.user.{RegisteredUserDTO, User}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class RegistrationService @Inject()(userDAO: UserDAO, registeredUserDAO: RegisteredUserDAO) {
 
-  def registration(user: RegisteredUserDTO) : Future[Long] = {
-
-    registeredUserDAO.find(user.email).flatMap { maybeUser =>
+  def registration(email: String, username: String, password: String) : Future[Long] = {
+    registeredUserDAO.find(email).flatMap { maybeUser =>
       if (maybeUser.isDefined) {
         throw new Exception("model.user.already.used")
       } else {
-        val userCreated = userDAO.create(new User(0L, Role.User))
+        val userCreated = userDAO.create(new User(None, Role.User))
 
         userCreated.map { id =>
-          user.userId = id
-          registeredUserDAO.save(user)
+          registeredUserDAO.save((id, email, username, password))
           id
         }
 
       }
     }
-
   }
 
 }

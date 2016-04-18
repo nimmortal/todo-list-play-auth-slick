@@ -3,20 +3,20 @@
 # ~~~~
 
 # Standard
-GET     /                           controllers.auth.login.AuthController.index
+GET     /                           controllers.auth.AuthController.index
 
 # Login
-GET     /login                      controllers.auth.login.AuthController.login
-POST    /login                      controllers.auth.login.AuthController.authenticate
-GET     /logout                     controllers.auth.login.AuthController.logout
+GET     /login                      controllers.auth.AuthController.login
+POST    /login                      controllers.auth.AuthController.authenticate
+GET     /logout                     controllers.auth.AuthController.logout
 
-GET     /registration               controllers.auth.registration.RegistrationController.goToRegistration
-POST    /registration               controllers.auth.registration.RegistrationController.registration
+GET     /registration               controllers.auth.RegistrationController.goToRegistration
+POST    /registration               controllers.auth.RegistrationController.registration
 
 # Facebook
-GET     /login/facebook             controllers.auth.login.FacebookAuthController.login(scope: String)
-GET     /link/facebook              controllers.auth.login.FacebookAuthController.link(scope: String)
-GET     /authorize/facebook         controllers.auth.login.FacebookAuthController.authorize
+GET     /login/facebook             controllers.auth.FacebookAuthController.login(scope: String)
+GET     /link/facebook              controllers.auth.FacebookAuthController.link(scope: String)
+GET     /authorize/facebook         controllers.auth.FacebookAuthController.authorize
 
 # Tasks
 GET     /task                       controllers.Tasks.addTask

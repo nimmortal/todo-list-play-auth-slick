@@ -1,7 +1,7 @@
-@import model.task.Task
 @import controllers.routes
-@import model.user.access.Role
+@import model.task.Task
 @import model.user.UserView
+@import model.user.access.Role
 @import model.util.Page
 @(tasks: Page[Task])(implicit userView: UserView)
 @import helper._
@@ -56,12 +56,12 @@
                                     <td>
                                         <div class="btn-group btn-group-sm" >
 
-                                            <a type="button" href="@routes.Tasks.editTask(task.id)" class="btn btn-default">Edit</a>
+                                            <a type="button" href="@routes.Tasks.editTask(task.id.get)" class="btn btn-default">Edit</a>
                                             @if(!task.ready) {
-                                                <a type="button" href="@routes.Tasks.completeTask(task.id)" class="btn btn-success">Complete</a>
+                                                <a type="button" href="@routes.Tasks.completeTask(task.id.get)" class="btn btn-success">Complete</a>
                                             }
                                             @if(userView.role == Role.Administrator) {
-                                                <a type="button" href="@routes.Tasks.deleteTask(task.id)" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
+                                                <a type="button" href="@routes.Tasks.deleteTask(task.id.get)" class="btn btn-danger" onclick="return confirm('Are you sure?');">Delete</a>
                                             }
                                         </div>
                                     </td>

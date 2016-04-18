@@ -2,11 +2,11 @@ package config
 
 import controllers.routes
 import jp.t2v.lab.play2.auth._
-import play.api.mvc.Results._
-import play.api.mvc._
 import model.user.access.Role
 import model.user.access.Role.{Administrator, BlockedUser, User}
 import model.user.dao.UserDAO
+import play.api.mvc.Results._
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.{ClassTag, classTag}
@@ -32,7 +32,7 @@ trait AuthConfiguration extends AuthConfig {
     Future.successful(Redirect(routes.Tasks.getTaskPage()))
 
   def authenticationFailed(request: RequestHeader)(implicit ctx: ExecutionContext): Future[Result] =
-    Future.successful(Redirect(controllers.auth.login.routes.AuthController.login()).withSession("access_uri" -> request.uri))
+    Future.successful(Redirect(controllers.auth.routes.AuthController.login()).withSession("access_uri" -> request.uri))
 
   override def authorizationFailed(request: RequestHeader, user: User, authority: Option[Authority])(implicit context: ExecutionContext): Future[Result] = {
     Future.successful(Forbidden("no permission"))

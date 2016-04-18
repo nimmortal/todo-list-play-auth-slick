@@ -3,12 +3,12 @@ package model.user.dao
 import javax.inject.{Inject, Singleton}
 
 import com.google.inject.ImplementedBy
+import model.user.User
+import model.user.User.UserTable
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.H2Driver.api._
 import slick.driver.JdbcProfile
 import slick.lifted.TableQuery
-import model.user.User
-import model.user.table.UserTableMapping
 
 import scala.concurrent.Future
 
@@ -23,7 +23,7 @@ trait UserDAO {
 class UserDAOImpl @Inject()(val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] with UserDAO {
 
-  val users = TableQuery[UserTableMapping]
+  val users = TableQuery[UserTable]
 
   override def get(id: Long) : Future[Option[User]] = db.run(users.filter(_.id === id).result.headOption)
 
