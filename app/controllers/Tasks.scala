@@ -17,7 +17,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 
-case class TaskForm(label: String, owner: String)
+case class TaskForm(label: String, owner: Option[String])
 
 @Singleton
 class Tasks @Inject()(userService: UserService,
@@ -32,9 +32,9 @@ class Tasks @Inject()(userService: UserService,
   def getTaskPage(page: Int, filter: String) = AsyncStack(AuthorityKey -> User) { implicit request =>
     val taskPage = taskDAO.getTaskPageFiltered(page - 1, 5, filter)
 
-    taskPage.map(p => {
+    taskPage.map(p =>
       Ok(views.html.index(p)(userView(loggedIn.id.get)))
-    })
+    )
   }
 
   def addTask() = StackAction(AuthorityKey -> User) { implicit request =>
@@ -46,8 +46,11 @@ class Tasks @Inject()(userService: UserService,
   def editTask(id: Long) = AsyncStack(AuthorityKey -> User) { implicit request =>
     implicit val user = userView(loggedIn.id.get)
 
-    val task = taskDAO get id
-    task.map(t => Ok(views.html.task(Some(id), taskForm.fill(TaskForm(t.get.label, t.get.owner)))))
+    taskDAO.get(id).map(t => t.fold {
+      BadRequest(views.html.task(Some(id), taskForm.withError("task", "task not exist")))
+    } { task =>
+      Ok(views.html.task(Some(id), taskForm.fill(TaskForm(task.label, Some(task.owner)))))
+    })
   }
 
   def newTask = StackAction(AuthorityKey -> User) { implicit request =>
@@ -56,7 +59,9 @@ class Tasks @Inject()(userService: UserService,
     taskForm.bindFromRequest().fold(
       errors => BadRequest(views.html.task(None, errors)),
       data => {
-        taskDAO.create(data.label, data.owner, LocalDateTime.now())
+        val owner = data.owner.getOrElse(loggedIn.id.get.toString)
+
+        taskDAO.create(data.label, owner, LocalDateTime.now())
         Redirect(routes.Tasks.getTaskPage())
       }
     )
@@ -69,8 +74,9 @@ class Tasks @Inject()(userService: UserService,
       errors => BadRequest(views.html.task(Some(id), errors)),
       data => {
         val oldTask = taskDAO get id
+        val owner = data.owner.getOrElse(loggedIn.id.get.toString)
 
-        oldTask.map(t => taskDAO.update(new Task(Some(id), data.label, data.owner, t.get.created, t.get.ready)))
+        oldTask.map(t => taskDAO.update(new Task(Some(id), data.label, owner, t.get.created, t.get.ready)))
         Redirect(routes.Tasks.getTaskPage())
       }
     )
@@ -95,10 +101,9 @@ class Tasks @Inject()(userService: UserService,
   val taskForm = Form(
     mapping(
       "label" -> nonEmptyText,
-      "owner" -> nonEmptyText
+      "owner" -> optional(text)
     )(TaskForm.apply)(TaskForm.unapply)
   )
 
-//  protected implicit def template(implicit model.user: User): String => Html => Html = html.main(model.user)
 }
 

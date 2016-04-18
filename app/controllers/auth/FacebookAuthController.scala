@@ -3,8 +3,9 @@ package controllers.auth
 import javax.inject._
 
 import config.AuthConfiguration
-import jp.t2v.lab.play2.auth.social.providers.facebook.{FacebookController, FacebookProviderUserSupport, FacebookUser}
+import jp.t2v.lab.play2.auth.social.providers.facebook.{FacebookController, FacebookProviderUserSupport, FacebookUser => FU}
 import model.auth.LoginService
+import model.user.FacebookUser
 import model.user.dao.{FacebookDAO, UserDAO}
 import play.api.Logger
 import play.api.Play.current
@@ -15,7 +16,10 @@ import play.api.mvc.{RequestHeader, Result}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: FacebookDAO, loginService: LoginService, val messagesApi: MessagesApi)
+class FacebookAuthController @Inject()(val userDAO: UserDAO,
+                                       val facebookDAO: FacebookDAO,
+                                       loginService: LoginService,
+                                       val messagesApi: MessagesApi)
   extends FacebookController
   with AuthConfiguration
   with FacebookProviderUserSupport {
@@ -23,7 +27,7 @@ class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: Fa
   // native realization throw json exception
   private def readProviderUser(accessToken: String, response: WSResponse): ProviderUser = {
     val j = response.json
-    FacebookUser(
+    FU(
       (j \ "id").as[String],
       (j \ "name").as[String],
       (j \ "email").as[String],
@@ -32,7 +36,7 @@ class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: Fa
     )
   }
 
-  override def retrieveProviderUser(accessToken: AccessToken)(implicit ctx: ExecutionContext): Future[FacebookUser] = {
+  override def retrieveProviderUser(accessToken: AccessToken)(implicit ctx: ExecutionContext): Future[FU] = {
     for {
       response <- WS.url("https://graph.facebook.com/me")
         .withQueryString("access_token" -> accessToken, "fields" -> "name,first_name,last_name,picture.type(large),email")
@@ -53,7 +57,7 @@ class FacebookAuthController @Inject()(val userDAO: UserDAO, val facebookDAO: Fa
 
   override def onOAuthLoginSucceeded(token: AccessToken)(implicit request: RequestHeader, ctx: ExecutionContext): Future[Result] = {
     retrieveProviderUser(token).flatMap { providerUser =>
-      val fu = new model.user.FacebookUser(0L, providerUser.id, providerUser.name, providerUser.email, providerUser.coverUrl, providerUser.accessToken)
+      val fu = new FacebookUser(0L, providerUser.id, providerUser.name, providerUser.email, providerUser.coverUrl, providerUser.accessToken)
 
       loginService.authenticateFacebook(fu).flatMap(id => gotoLoginSucceeded(id))
     }
