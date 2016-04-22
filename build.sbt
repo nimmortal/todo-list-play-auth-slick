@@ -18,7 +18,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.0",
   "jp.t2v" %% "play2-auth"        % "0.14.2",
   "jp.t2v" %% "play2-auth-social" % "0.14.2", // for social login
-  "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test"
+  "jp.t2v" %% "play2-auth-test"   % "0.14.2" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
